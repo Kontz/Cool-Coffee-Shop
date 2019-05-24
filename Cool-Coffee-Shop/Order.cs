@@ -101,7 +101,7 @@ namespace Cool_Coffee_Shop
         }
         public void PayCredit() //need to validate number, date, cvv 
         {
-            string userCCNumber, userCCExpireDate, userCVV;
+            string userCCNumber, userCVV, userCCMonth,userCCYear;
 
             Console.Write("Enter Credit Card Number: ");
             userCCNumber = Console.ReadLine();
@@ -112,14 +112,24 @@ namespace Cool_Coffee_Shop
                 userCCNumber = Console.ReadLine();
             }
 
-            Console.Write("\nEnter Credit Card Experation Date: ");//<- still need to validate the date
-            userCCExpireDate = Console.ReadLine();
-            int cCExpireDate = 0;
-           
-            while (!int.TryParse(userCCExpireDate, out cCExpireDate))  
+            Console.Write("\nEnter Credit Card Experation Date");//<- still need to validate the date
+            Console.Write("\nEnter the month(mm): ");
+            userCCMonth = Console.ReadLine();
+            int cCMonth = 0;
+            while (!int.TryParse(userCCMonth, out cCMonth) && cCMonth > 0 && cCMonth < 13)
             {
-                Console.Write("\nInvalid Experation Date.  \nEnter  Experation Date: ");
-                userCCExpireDate = Console.ReadLine();
+                Console.Write("\nInvalid month.  \nEnter the month(mm): ");
+                userCCMonth = Console.ReadLine();
+            }
+            
+            Console.Write("\nEnter Year (yyyy): " );
+            userCCYear = Console.ReadLine();
+            int cCYear = 0;
+           
+            while (!int.TryParse(userCCYear, out cCYear) && cCYear > 2000)  
+            {
+                Console.Write("\nInvalid year.  \nEnter Year (yyyy): ");
+                userCCYear = Console.ReadLine();
             }
 
             Console.Write("\nEnter Credit Card CVV: ");
@@ -131,20 +141,22 @@ namespace Cool_Coffee_Shop
                 userCVV = Console.ReadLine();
             }
 
-            double userCredit, orderTotal;
+            double userCredit;
             userCredit = Convert.ToDouble(Console.ReadLine());
-            orderTotal =0;  //<- pull total from elsewhere and add here 
-            while(userCredit != orderTotal)
+            while(userCredit != TotalOrder)
             {
                 Console.WriteLine("Insufficiant funds. Please verify total.");
                 userCredit = Convert.ToDouble(Console.ReadLine());
             }
+            
+            
+
         }
         public void PayCheck()
         {
             int checkVerify;
             string checkNumber;
-            double checkTotal, orderTotal;
+            double checkTotal;
             Console.Write("Please enter the four(4) digit check number: ");
             checkNumber = Console.ReadLine();
             while (!int.TryParse(checkNumber, out checkVerify) && checkNumber.Length == 3)
@@ -154,14 +166,13 @@ namespace Cool_Coffee_Shop
             }
 
             checkTotal = Convert.ToDouble(Console.ReadLine()); //<- Place holder
-            orderTotal = 0; //<- Place holder Pull total from elsewhere. 
-            while(checkTotal != orderTotal)
+            while(checkTotal != TotalOrder)
             {
                 Console.WriteLine("Insufficiant funds. Please verify total.");
                 checkTotal = Convert.ToDouble(Console.ReadLine());
             }
-
         }
+
         public void Cancel()
         {
             Console.WriteLine($"Order {OrderID} has been cancelled. Press any key to return to main menu.");
