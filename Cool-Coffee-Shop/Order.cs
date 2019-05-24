@@ -14,8 +14,6 @@ namespace Cool_Coffee_Shop
         public double TotalOrder { get; set; }
         private static readonly double TaxRate = 0.06;
 
-
-
         public Order()
         {
             orderCounter++;
@@ -23,24 +21,15 @@ namespace Cool_Coffee_Shop
 
             OrderList = new List<OrderLine>();
         }
-
         public void AddToAnOrder(Product addedProduct, int qty)
         {
             OrderList.Add(new OrderLine(addedProduct, qty));
         }
-
-        //public Product RemoveFromAnOrder()
-        //{
-
-        //}
-
-
-        public double CalculateTotal(List<OrderLine> OrderList)
+        //public Product RemoveFromAnOrder() { }
+        public void CalculateTotal(List<OrderLine> OrderList)
         {
-            double total = CalculateSubTotal(OrderList) + CalculateTaxRate(OrderList);
-            return total;
+            TotalOrder = CalculateSubTotal(OrderList) + CalculateTaxRate(OrderList);
         }
-
         public double CalculateSubTotal(List<OrderLine>OrderList)
         {
             double subTotal = 0;
@@ -51,15 +40,10 @@ namespace Cool_Coffee_Shop
             }
             return subTotal;
         }
-
         public double CalculateTaxRate(List<OrderLine> OrderList)
         {
             return CalculateSubTotal(OrderList) * TaxRate;
         }
-
-
-
-
         public void Pay()
         {
             CalculateTotal(OrderList);
@@ -92,22 +76,29 @@ namespace Cool_Coffee_Shop
         }
         public void PayCash()
         { 
-            double userPayCash,orderTotal, orderChange; // place holder
-            userPayCash = 4 ;
-            orderTotal = 0; //<- pull total from elsewhere and add here
-            Console.WriteLine($"Cash Received: {userPayCash}");
-            
-            if (userPayCash > orderTotal)
+            double userPayCash, orderChange; // place holder
+            while (true)
             {
-                orderChange = userPayCash - orderTotal;
-                Console.WriteLine($"Total Change: " + orderChange);
-            }
-            else
-            {
-                Console.WriteLine("Insufficient funds.");
+                userPayCash = GetCash(); // get input from user, cash paid.
+                Console.WriteLine($"Cash Received: {userPayCash}");
+
+                if (userPayCash > TotalOrder)
+                {
+                    orderChange = userPayCash - TotalOrder;
+                    Console.WriteLine($"Total Change: " + orderChange);
+                    return;
+                }
+                else
+                {
+                    Console.WriteLine("Insufficient funds.");
+                }
             }
         }
-
+        private double GetCash()
+        {
+            // get cash from user.
+            return 5.00;
+        }
         public void PayCredit() //need to validate number, date, cvv 
         {
             string userCCNumber, userCVV, userCCMonth,userCCYear;
@@ -125,9 +116,9 @@ namespace Cool_Coffee_Shop
             Console.Write("\nEnter the month(mm): ");
             userCCMonth = Console.ReadLine();
             int cCMonth = 0;
-            while (!int.TryParse(userCCMonth, out cCMonth)&& cCMonth > 0 && cCMonth < 13)
+            while (!int.TryParse(userCCMonth, out cCMonth) && cCMonth > 0 && cCMonth < 13)
             {
-                Console.Write("\nInvalid month.  \nEnter  Enter the month(mm): ");
+                Console.Write("\nInvalid month.  \nEnter the month(mm): ");
                 userCCMonth = Console.ReadLine();
             }
             
@@ -150,52 +141,43 @@ namespace Cool_Coffee_Shop
                 userCVV = Console.ReadLine();
             }
 
-            double userCredit, orderTotal;
+            double userCredit;
             userCredit = Convert.ToDouble(Console.ReadLine());
-            orderTotal =0;  //<- pull total from elsewhere and add here 
-            while(userCredit != orderTotal)
+            while(userCredit != TotalOrder)
             {
                 Console.WriteLine("Insufficiant funds. Please verify total.");
                 userCredit = Convert.ToDouble(Console.ReadLine());
             }
-        }
+            
+            
 
+        }
         public void PayCheck()
         {
             int checkVerify;
             string checkNumber;
-            double checkTotal, orderTotal;
+            double checkTotal;
             Console.Write("Please enter the four(4) digit check number: ");
             checkNumber = Console.ReadLine();
-            while (!int.TryParse(checkNumber, out checkVerify) && checkNumber.Length != 3)
+            while (!int.TryParse(checkNumber, out checkVerify) && checkNumber.Length == 3)
             {
                 Console.WriteLine("Invalid Entry. Please re-enter the check number: ");
                 checkNumber = Console.ReadLine();
             }
 
             checkTotal = Convert.ToDouble(Console.ReadLine()); //<- Place holder
-            orderTotal = 0; //<- Place holder Pull total from elsewhere. 
-            while(checkTotal != orderTotal)
+            while(checkTotal != TotalOrder)
             {
                 Console.WriteLine("Insufficiant funds. Please verify total.");
                 checkTotal = Convert.ToDouble(Console.ReadLine());
             }
-
         }
 
         public void Cancel()
         {
             Console.WriteLine($"Order {OrderID} has been cancelled. Press any key to return to main menu.");
             Console.ReadKey();
-            // return to main menu
         }
-        //public void PrintReceipt()
-        //{
-        //    //At the end, display a receipt with all items ordered, subtotal, grand total, and
-        //    //appropriate payment info.
-        //    Console.WriteLine($"");
-        //}
-
         public void PrintReceipt(List<OrderLine> OrderList, double payment)
         {
             StringBuilder receipt = new StringBuilder("");
