@@ -70,12 +70,30 @@ namespace Cool_Coffee_Shop
             // Choose Payment type. Switch to Specific payment process.
             while (true)
             {
-                Console.WriteLine($"How would you like to pay for your order? Please select options 0-2: \n0 - Cash, 1 - Crdeit/Debit, 2 - Check");                 //*** Maybe no need for Enum Payment Type, just ask for an int and switch  should follow?***                  var paymentType = int.TryParse(Console.ReadLine(), out int result);                 switch (result)                 {                     case 0:                         PayCash();                         return;                     case 1:                         PayCredit();                         return;                     case 2:                         PayCheck();                         return;                     default:                         Console.WriteLine("Unknown Payment Type.");                         break;                 }
+                Console.WriteLine($"How would you like to pay for your order? Please select options 0-2: \n0 - Cash, 1 - Crdeit/Debit, 2 - Check");
+                //*** Maybe no need for Enum Payment Type, just ask for an int and switch  should follow?***
+
+                var paymentType = int.TryParse(Console.ReadLine(), out int result);
+                switch (result)
+                {
+                    case 0:
+                        PayCash();
+                        return;
+                    case 1:
+                        PayCredit();
+                        return;
+                    case 2:
+                        PayCheck();
+                        return;
+                    default:
+                        Console.WriteLine("Unknown Payment Type.");
+                        break;
+                }
                 //*** view note above
 
                 //if (Enum.TryParse(typeof(PaymentType), Console.ReadLine(), out PaymentType input))
                 // get input of type PaymentType
-                var input = PaymentType.Credit;
+                var input = PaymentType.Cash;
                 {
                     switch (input)
                     {
@@ -105,50 +123,61 @@ namespace Cool_Coffee_Shop
                 userPayCash = GetCash(); // get input from user, cash paid.
                 Console.WriteLine($"Cash Received: {userPayCash}");
 
-                if (userPayCash > TotalOrder)
+                if (userPayCash >= TotalOrder)
                 {
                     orderChange = userPayCash - TotalOrder;
-                    Console.WriteLine($"Total Change: " + orderChange);
+                    Console.WriteLine($"Total Change: ${0:0.00}", orderChange);
                     return;
                 }
                 else
                 {
                     Console.WriteLine("Insufficient funds.");
                 }
+
             }
         }
         private double GetCash()
         {
-            // get cash from user.
-            return 5.00;
+            double getCash = double.Parse(Console.ReadLine());
+            return getCash;
         }
+
+
         public void PayCredit() //need to validate number, date, cvv 
         {
-            string userCCNumber, userCCExpireDate, userCVV;
+            string userCCNumber, userCCMonth, userCCYear, userCVV;
 
             Console.Write("Enter Credit Card Number: ");
             userCCNumber = Console.ReadLine();
             int cCnumber = 0;
-            while (!int.TryParse(userCCNumber, out cCnumber) && userCCNumber.Length == 15) 
+            while (!int.TryParse(userCCNumber, out cCnumber) && userCCNumber.Length == 15)
             {
                 Console.Write("\nInvalid card number. \nEnter the 16 digit card number located on the front:");
                 userCCNumber = Console.ReadLine();
             }
 
-            Console.Write("\nEnter Credit Card Experation Date: ");//<- still need to validate the date
-            userCCExpireDate = Console.ReadLine();
-            int cCExpireDate = 0;
-           
-            while (!int.TryParse(userCCExpireDate, out cCExpireDate))  
+            Console.Write("\nEnter Credit Card Experation Month (2 digit): ");//<- still need to validate the date
+            userCCMonth = Console.ReadLine();
+            int cCMonth = 0;
+            while (!int.TryParse(userCCMonth, out cCMonth) && userCCMonth.Length == 1)
             {
-                Console.Write("\nInvalid Experation Date.  \nEnter  Experation Date: ");
-                userCCExpireDate = Console.ReadLine();
+                Console.Write("\nInvalid Experation Date.  \nEnter  Experation Month: ");
+                userCCMonth = Console.ReadLine();
+            }
+
+            Console.Write("\nEnter Credit Card Experation year (4 digit): ");//<- still need to validate the date
+            userCCYear = Console.ReadLine();
+            int cCYear = 0;
+            while (!int.TryParse(userCCYear, out cCYear) && userCCYear.Length == 3)
+            {
+                Console.Write("\nInvalid Experation Date.  \nEnter  Experation Year: ");
+                userCCYear = Console.ReadLine();
             }
 
             Console.Write("\nEnter Credit Card CVV: ");
             userCVV = Console.ReadLine();
             int cVV = 0;
-            while (!int.TryParse(userCVV, out cVV) && userCVV.Length == 2)  //Also need to check for 3 digit intiger
+            while (!int.TryParse(userCVV, out cVV) && userCVV.Length == 2)  
             {
                 Console.Write("\nInvalid CVV.  \nEnter 3 Digit CVV located on the back of the card: ");
                 userCVV = Console.ReadLine();
@@ -156,13 +185,14 @@ namespace Cool_Coffee_Shop
 
             double userCredit, orderTotal;
             userCredit = Convert.ToDouble(Console.ReadLine());
-            orderTotal =0;  //<- pull total from elsewhere and add here 
+            orderTotal =TotalOrder;  
             while(userCredit != orderTotal)
             {
                 Console.WriteLine("Insufficiant funds. Please verify total.");
                 userCredit = Convert.ToDouble(Console.ReadLine());
             }
         }
+        
         public void PayCheck()
         {
             int checkVerify;
@@ -176,8 +206,8 @@ namespace Cool_Coffee_Shop
                 checkNumber = Console.ReadLine();
             }
 
-            checkTotal = Convert.ToDouble(Console.ReadLine()); //<- Place holder
-            orderTotal = 0; //<- Place holder Pull total from elsewhere. 
+            checkTotal = Convert.ToDouble(Console.ReadLine()); 
+            orderTotal = TotalOrder;
             while(checkTotal != orderTotal)
             {
                 Console.WriteLine("Insufficiant funds. Please verify total.");
