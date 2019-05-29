@@ -120,13 +120,14 @@ namespace Cool_Coffee_Shop
             double userPayCash, orderChange; // place holder
             while (true)
             {
+                Console.Write("Enter the cash received: ");
                 userPayCash = GetCash(); // get input from user, cash paid.
-                Console.WriteLine($"Cash Received: {userPayCash}");
+                Console.WriteLine($"Cash Received: ${userPayCash:0.00}");
 
                 if (userPayCash >= TotalOrder)
                 {
                     orderChange = userPayCash - TotalOrder;
-                    Console.WriteLine($"Total Change: ${0:0.00}", orderChange);
+                    Console.WriteLine($"Total Change: ${orderChange:0.00}");
                     return;
                 }
                 else
@@ -165,7 +166,7 @@ namespace Cool_Coffee_Shop
                 userCCMonth = Console.ReadLine();
             }
 
-            Console.Write("\nEnter Credit Card Experation year (4 digit): ");//<- still need to validate the date
+            Console.Write("\nEnter Credit Card Experation Year (4 digit): ");//<- still need to validate the date
             userCCYear = Console.ReadLine();
             int cCYear = 0;
             while (!int.TryParse(userCCYear, out cCYear) && userCCYear.Length == 3)
@@ -182,15 +183,16 @@ namespace Cool_Coffee_Shop
                 Console.Write("\nInvalid CVV.  \nEnter 3 Digit CVV located on the back of the card: ");
                 userCVV = Console.ReadLine();
             }
-
-            double userCredit, orderTotal;
+            Console.Write("Total amount on card: ");
+            double userCredit;
             userCredit = Convert.ToDouble(Console.ReadLine());
-            orderTotal =TotalOrder;  
-            while(userCredit != orderTotal)
+            while(userCredit != TotalOrder)
             {
                 Console.WriteLine("Insufficiant funds. Please verify total.");
                 userCredit = Convert.ToDouble(Console.ReadLine());
             }
+
+
         }
         
         public void PayCheck()
