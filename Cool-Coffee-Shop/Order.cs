@@ -183,7 +183,7 @@ namespace Cool_Coffee_Shop
                 Console.Write("\nInvalid CVV.  \nEnter 3 Digit CVV located on the back of the card: ");
                 userCVV = Console.ReadLine();
             }
-            Console.Write("Total amount on card: ");
+            Console.Write("Confirm total placed on card: ");
             double userCredit;
             userCredit = Convert.ToDouble(Console.ReadLine());
             while(userCredit != TotalOrder)
