@@ -90,27 +90,22 @@ namespace Cool_Coffee_Shop
         public void PayCash()
         { 
             double userPayCash, orderChange; // place holder
-            while (true)
-            {
-                Console.Write("How much cash do you offer? ");
-                userPayCash = GetCash(); // get input from user, cash paid.
-                Console.WriteLine($"Cash Received: ${userPayCash}");
+            Console.Write("How much cash do you offer? ");
+            userPayCash = GetCash(); // get input from user, cash paid.
+            
+            Console.WriteLine($"Cash Received: ${userPayCash}");
 
-                if (userPayCash >= TotalOrder)
-                {
-                    orderChange = userPayCash - TotalOrder;
-                    Console.WriteLine($"Total Change: $" + orderChange);
-                    Console.ReadKey();
-                    return;
-                }
-                else
-                {
-                    Console.WriteLine("Insufficient funds.");
-                    Console.ReadKey();
-                }
-                //Print receipt
+            while (userPayCash < TotalOrder)
+            {
+                Console.WriteLine("Insufficient funds.");
+                userPayCash = GetCash(); // get input from user, cash paid.
             }
+            //Print receipt
+            orderChange = userPayCash - TotalOrder;
+            Console.WriteLine($"Total Change: $" + orderChange);
+            PrintReceipt();
         }
+
         private double GetCash()
         {
             return double.Parse(Console.ReadLine());
