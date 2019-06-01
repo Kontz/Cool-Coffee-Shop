@@ -78,6 +78,7 @@ namespace Cool_Coffee_Shop
                 //*** Maybe no need for Enum Payment Type, just ask for an int and switch  should follow?***
 
                 var paymentType = int.TryParse(Console.ReadLine(), out int result);
+                PaymentType = result;
                 switch (result)
                 {
                     case 1:
@@ -104,37 +105,19 @@ namespace Cool_Coffee_Shop
             Console.WriteLine($"Cash Received: ${userPayCash}");
             while (userPayCash < TotalOrder)
             {
-                /*Console.Write("How much cash do you offer? ");
-                userPayCash = GetCash(); // get input from user, cash paid.
-                Console.WriteLine($"Cash Received: ${userPayCash}");
-
-                if (userPayCash >= TotalOrder)
-                {
-                    orderChange = userPayCash - TotalOrder;
-                    Console.WriteLine($"Total Change: $" + orderChange);
-                    Console.ReadKey();
-                    return;
-                }*/
-                //else
-
-                    Console.WriteLine("Insufficient funds.");
-                    userPayCash = GetCash(); // get input from user, cash paid.
-
-                    Console.ReadKey();
-
+                    Console.Write("Insufficient funds.\nMake a new cash offer: ");
+                    userPayCash = GetCash();
             }
             if (userPayCash >= TotalOrder)
             {
                 orderChange = userPayCash - TotalOrder;
                 Console.WriteLine($"Total Change: $" + orderChange);
                 PrintReceipt();
-
                 Console.ReadKey();
-                PrintReceipt();
 
-                //return;
             }
             PrintReceipt();
+            Console.ReadKey();
         }
         private double GetCash()
         {
@@ -170,9 +153,9 @@ namespace Cool_Coffee_Shop
                 Console.Write("\nInvalid CVV.  \nEnter 3 Digit CVV located on the back of the card: ");
                 userCVV = Console.ReadLine();
             }
-                Console.WriteLine("Payment accepted.");
-            Console.ReadKey();
+            Console.WriteLine("Payment accepted.");
             PrintReceipt();
+            Console.ReadKey();
         }
         public void PayCheck()
         {
@@ -186,16 +169,17 @@ namespace Cool_Coffee_Shop
                 Console.Write("Invalid Entry. \nEnter the 4 digit check number: ");
                 checkNumber = Console.ReadLine();
             }
-            Console.Write("Enter Check Total: ");
+            Console.Write("Enter check total: ");
             checkTotal = Convert.ToDouble(Console.ReadLine());
             while (checkTotal != TotalOrder)
             {
                 Console.WriteLine("Totals do not match. Please verify total.");
+                Console.Write("Enter check total: ");
                 checkTotal = Convert.ToDouble(Console.ReadLine());
             }
             Console.WriteLine("Your check payment has cleared");
-            Console.ReadKey();
             PrintReceipt();
+            Console.ReadKey();
         }
         public void Cancel()
         {
@@ -219,15 +203,15 @@ namespace Cool_Coffee_Shop
                );
                 switch (PaymentType) //make sure switch statement is displayed properly
                 {
-                    case 0:
+                    case 1:
                         Console.WriteLine("Cash Payment");
                         break;
-                    case 1:
+                    case 2:
                         var lastFourDigits = Console.Read();
                         Console.WriteLine("Credit/Debit Payment");
                         Console.WriteLine("XXXXX{0}", lastFourDigits); //make this better
                         break;
-                    case 2:
+                    case 3:
                         Console.WriteLine("Check Payment");
                         break;
                     default:
