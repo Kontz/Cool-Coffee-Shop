@@ -27,7 +27,7 @@ namespace Cool_Coffee_Shop
                 //Console.WriteLine("Please make a selection between options 1-4");
                 //Console.WriteLine("1 - Create an Order, 2 - Add a new product to menu, 3 - See the menu, 4 - Exit Coffee Shop App");
 
-                var userSelection = int.TryParse(Console.ReadLine(), out int result); 
+                var userSelection = int.TryParse(Console.ReadLine(), out int result);
                 switch (result)
                 {
                     case 1:
@@ -58,8 +58,18 @@ namespace Cool_Coffee_Shop
             Console.Clear();
             Header.DrawHeader();
             Header.DrawMenu(ListOfProducts);
+            while (Common.KeepGoing("Would you like to learn more about a product?"))
+            {
+                LearnMore();
+            }
             Console.WriteLine("Press any key to continue: ");
             Console.ReadKey();
+        }
+        private void LearnMore()
+        {
+            Console.Write($"Which product would you like to learn more about? (1-{ListOfProducts.Count})? ");
+            var choice = Common.GetInt(1, ListOfProducts.Count);
+            Console.Write($"\n{ListOfProducts[choice - 1].Name}: {ListOfProducts[choice - 1].Description}\n\n");
         }
         private void AddNewProduct()
         {
