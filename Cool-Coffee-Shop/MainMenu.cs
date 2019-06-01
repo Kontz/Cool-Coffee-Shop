@@ -7,40 +7,42 @@ namespace Cool_Coffee_Shop
     public class MainMenu
     {
         public List<Product> ListOfProducts { get; set; }
+        public HeaderBar Header { get; set; }
 
         public MainMenu(List<Product> productList)
         {
             ListOfProducts = productList;
+            Header = new HeaderBar(64);
         }
         public void RunMainMenu()
         {
-            Console.Clear();
+            while (true)
+            {
+                Console.Clear();
+                Header.DrawHeader();
 
-            //var runOrderMenu = new OrderMenu();
-            //Above the compiler does not like this
+                Console.WriteLine("Please make a selection between options 1-4");
+                Console.WriteLine("1 - Create an Order, 2 - Add a new product to menu, 3 - Remove a product from the menu 4 - Exit Coffee Shop App");
 
-            Console.WriteLine("Please make a selection between options 1-4");
-            Console.WriteLine("1 - Create an Order, 2 - Add a new product to menu, 3 - Remove a product from the menu 4 - Exit Coffee Shop App");
-            var userSelection = int.TryParse(Console.ReadLine(), out int result);             if (result == 1)
-            {
-                CreateNewOrder();
-            }
-            //****Possibly remove 2 and 3 options???
-            else if (result == 2)
-            {
-                //addNewProduct to the menu(SeedDB) (brand new product on the menu, ask for: string name, string category, string description, int price)
-            }
-            else if (result == 3)
-            {
-                //removeProduct from menu (SeedDB)()
-            }
-            else if (result == 4)
-            {
-                Console.WriteLine("Have a great day. Goodbye!!");
-            }
-            else
-            {
-                Console.WriteLine("The value you have entered is invalid. Please try again.");
+                var userSelection = int.TryParse(Console.ReadLine(), out int result); 
+                switch (result)
+                {
+                    case 1:
+                        CreateNewOrder();
+                        break;
+                    case 2:
+                        var seed = new SeedDB();
+                        seed.AddNewProduct();
+                        break;
+                    case 3:
+                        break;
+                    case 4:
+                        Console.WriteLine("Have a great day. Goodbye!!");
+                        return;
+                    default:
+                        Console.WriteLine("The value you have entered is invalid. Please try again.");
+                        break;
+                }
             }
         }
         private void CreateNewOrder()

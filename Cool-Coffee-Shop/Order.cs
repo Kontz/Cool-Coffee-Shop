@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Cool_Coffee_Shop
 {
@@ -12,7 +13,10 @@ namespace Cool_Coffee_Shop
         public List<OrderLine> OrderList { get; set; }
         public double SubTotal { get; set; }
         public double TotalOrder { get; set; }
+        public double PaymentGeneric { get; set; } //cash payment
+        public int PaymentType { get; set; } // credit, check
         private static readonly double TaxRate = 0.06;
+        public double PaymentDetail { get; set; }
 
         public Order()
         {
@@ -22,229 +26,218 @@ namespace Cool_Coffee_Shop
             OrderList = new List<OrderLine>();
         }
         public void AddToAnOrder(Product addedProduct, int qty)
-        {
+        {   
             OrderList.Add(new OrderLine(addedProduct, qty));
         }
                 //Right now Remove from order does nothing
                 //Attempted to print the current order and have the user select what they would like to remove but items in orderlist are not appearring. for and foreach loop
                 //Should it be a perimeter of type Product to remove the specific Product Item   
-        public void RemoveFromAnOrder() 
+        public void RemoveFromAnOrder() // ??
         {
             for (var i = 1; i <= OrderList.Count; i++)
             {
                 Console.WriteLine($"{ i} - { OrderList[i - 1].Item}");
             }
-            /*
-            foreach (var item in OrderList)
-            {
-                Console.WriteLine(item);
-            }
-            Console.WriteLine("Which product would you like to remove from your order list?");
-            var productRemoved = Console.ReadLine();
-            */
         }
-
-        public void CalculateTotal(List<OrderLine> OrderList)
+        //Get rid of above possibly and change Order Menu
+        public void CalculateTotal()
         {
-            TotalOrder = CalculateSubTotal(OrderList) + CalculateTaxRate(OrderList);
+            CalculateSubTotal();
+            TotalOrder = SubTotal + CalculateTaxRate();
         }
-        public double CalculateSubTotal(List<OrderLine>OrderList)
+        public void CalculateSubTotal()
         {
-            double subTotal = 0;
+            SubTotal = 0;
             foreach (var itemLine in OrderList)
             {
                 double costOfItems = itemLine.Qty * itemLine.Item.Price;
-                subTotal += costOfItems;
+                SubTotal += costOfItems;
             }
-            return subTotal;
         }
-        public double CalculateTaxRate(List<OrderLine> OrderList)
+        public double CalculateChange(double total, double payment)
         {
-            return CalculateSubTotal(OrderList) * TaxRate;
+            TotalOrder = total;
+            return payment - total;
+        }
+        public double CalculateTaxRate()
+        {
+            return SubTotal * TaxRate;
         }
         public void Pay()
         {
-            CalculateTotal(OrderList);
-
-            //***Prompt user to select their payment type of choice
-            // Choose Payment type. Switch to Specific payment process.
+            CalculateTotal();
+            TotalOrder = Math.Round(TotalOrder, 2);
+             
+            Console.WriteLine($"Your grand total is: {TotalOrder}");
             while (true)
             {
-                Console.WriteLine($"How would you like to pay for your order? Please select options 0-2: \n0 - Cash, 1 - Crdeit/Debit, 2 - Check");
+                Console.WriteLine($"How would you like to pay for your order? Please select options 1-3: \n1 - Cash, 2 - Crdeit/Debit, 3 - Check");
                 //*** Maybe no need for Enum Payment Type, just ask for an int and switch  should follow?***
 
                 var paymentType = int.TryParse(Console.ReadLine(), out int result);
                 switch (result)
                 {
-                    case 0:
+                    case 1:
                         PayCash();
                         return;
-                    case 1:
+                    case 2:
                         PayCredit();
                         return;
-                    case 2:
+                    case 3:
                         PayCheck();
                         return;
                     default:
                         Console.WriteLine("Unknown Payment Type.");
                         break;
                 }
-                //*** view note above
-
-                //if (Enum.TryParse(typeof(PaymentType), Console.ReadLine(), out PaymentType input))
-                // get input of type PaymentType
-                var input = PaymentType.Cash;
-                {
-                    switch (input)
-                    {
-                        case PaymentType.Cash:
-                            PayCash();
-                            return;
-                        case PaymentType.Credit:
-                            PayCredit();
-                            return;
-                        case PaymentType.Check:
-                            PayCheck();
-                            return;
-                        default:
-                            Console.WriteLine("Unknown Payment Type.");
-                            break;
-                    }
-                }
                 Console.Write("Input error: Please try again: ");
             }
-            //** view note above the switch above
         }
         public void PayCash()
         { 
             double userPayCash, orderChange; // place holder
-            while (true)
+            Console.Write("How much cash do you offer? ");
+            userPayCash = GetCash(); // get input from user, cash paid.
+            Console.WriteLine($"Cash Received: ${userPayCash}");
+            while (userPayCash < TotalOrder)
             {
-                Console.Write("Enter the cash received: ");
+                /*Console.Write("How much cash do you offer? ");
                 userPayCash = GetCash(); // get input from user, cash paid.
-                Console.WriteLine($"Cash Received: ${userPayCash:0.00}");
+                Console.WriteLine($"Cash Received: ${userPayCash}");
 
                 if (userPayCash >= TotalOrder)
                 {
                     orderChange = userPayCash - TotalOrder;
-                    Console.WriteLine($"Total Change: ${orderChange:0.00}");
+                    Console.WriteLine($"Total Change: $" + orderChange);
+                    Console.ReadKey();
                     return;
-                }
-                else
-                {
+                }*/
+                //else
+
                     Console.WriteLine("Insufficient funds.");
-                }
+                    userPayCash = GetCash(); // get input from user, cash paid.
+
+                    Console.ReadKey();
 
             }
+            if (userPayCash >= TotalOrder)
+            {
+                orderChange = userPayCash - TotalOrder;
+                Console.WriteLine($"Total Change: $" + orderChange);
+                PrintReceipt();
+
+                Console.ReadKey();
+                PrintReceipt();
+
+                //return;
+            }
+            PrintReceipt();
         }
         private double GetCash()
         {
-            double getCash = double.Parse(Console.ReadLine());
-            return getCash;
+            return double.Parse(Console.ReadLine());
         }
-
-
-        public void PayCredit() //need to validate number, date, cvv 
+        public void PayCredit()
         {
-            string userCCNumber, userCCMonth, userCCYear, userCVV;
+            string userCCNumber, userCVV, userCCDate;
 
-            Console.Write("Enter Credit Card Number: ");
+            Console.Write("Enter the 16 Digit Card Number:: ");
+            var cardCheck = new Regex(@"^([\-\s]?[0-9]{4}){4}$");
             userCCNumber = Console.ReadLine();
-            int cCnumber = 0;
-            while (!int.TryParse(userCCNumber, out cCnumber) && userCCNumber.Length == 15)
+            while (!cardCheck.IsMatch(userCCNumber))
             {
-                Console.Write("\nInvalid card number. \nEnter the 16 digit card number located on the front:");
+                Console.Write($"\nInvalid card number. \nEnter the 16 Digit Card Number: ");
                 userCCNumber = Console.ReadLine();
             }
 
-            Console.Write("\nEnter Credit Card Experation Month (2 digit): ");//<- still need to validate the date
-            userCCMonth = Console.ReadLine();
-            int cCMonth = 0;
-            while (!int.TryParse(userCCMonth, out cCMonth) && userCCMonth.Length == 1)
+            Console.Write("\nEnter Credit Card Expiration Date(mm/yyyy): ");
+            var dateCheck = new Regex(@"^(0[1-9]|1[0-2])([/])(20[0-9]{2})$");
+            userCCDate = Console.ReadLine();
+            while (!dateCheck.IsMatch(userCCDate))
             {
-                Console.Write("\nInvalid Experation Date.  \nEnter  Experation Month: ");
-                userCCMonth = Console.ReadLine();
-            }
-
-            Console.Write("\nEnter Credit Card Experation Year (4 digit): ");//<- still need to validate the date
-            userCCYear = Console.ReadLine();
-            int cCYear = 0;
-            while (!int.TryParse(userCCYear, out cCYear) && userCCYear.Length == 3)
-            {
-                Console.Write("\nInvalid Experation Date.  \nEnter  Experation Year: ");
-                userCCYear = Console.ReadLine();
+                Console.Write("\nInvalid month.  \nEnter the Expiration Date(mm/yyyy): ");
+                userCCDate = Console.ReadLine();
             }
 
             Console.Write("\nEnter Credit Card CVV: ");
+            var cvvCheck = new Regex(@"^\d{3}$");
             userCVV = Console.ReadLine();
-            int cVV = 0;
-            while (!int.TryParse(userCVV, out cVV) && userCVV.Length == 2)  
+            while (!cvvCheck.IsMatch(userCVV))
             {
                 Console.Write("\nInvalid CVV.  \nEnter 3 Digit CVV located on the back of the card: ");
                 userCVV = Console.ReadLine();
             }
-            Console.Write("Confirm total placed on card: ");
-            double userCredit;
-            userCredit = Convert.ToDouble(Console.ReadLine());
-            while(userCredit != TotalOrder)
-            {
-                Console.WriteLine("Insufficiant funds. Please verify total.");
-                userCredit = Convert.ToDouble(Console.ReadLine());
-            }
-
-
+                Console.WriteLine("Payment accepted.");
+            Console.ReadKey();
+            PrintReceipt();
         }
-        
         public void PayCheck()
         {
-            int checkVerify;
             string checkNumber;
-            double checkTotal, orderTotal;
-            Console.Write("Please enter the four(4) digit check number: ");
+            double checkTotal;
+            Console.Write("Enter the 4 digit check number: ");
+            var checkVerify = new Regex(@"^\d{4}$");
             checkNumber = Console.ReadLine();
-            while (!int.TryParse(checkNumber, out checkVerify) && checkNumber.Length == 3)
+            while (!checkVerify.IsMatch(checkNumber))
             {
-                Console.WriteLine("Invalid Entry. Please re-enter the check number: ");
+                Console.Write("Invalid Entry. \nEnter the 4 digit check number: ");
                 checkNumber = Console.ReadLine();
             }
-
-            checkTotal = Convert.ToDouble(Console.ReadLine()); 
-            orderTotal = TotalOrder;
-            while(checkTotal != orderTotal)
+            Console.Write("Enter Check Total: ");
+            checkTotal = Convert.ToDouble(Console.ReadLine());
+            while (checkTotal != TotalOrder)
             {
-                Console.WriteLine("Insufficiant funds. Please verify total.");
+                Console.WriteLine("Totals do not match. Please verify total.");
                 checkTotal = Convert.ToDouble(Console.ReadLine());
             }
-
+            Console.WriteLine("Your check payment has cleared");
+            Console.ReadKey();
+            PrintReceipt();
         }
         public void Cancel()
         {
             Console.WriteLine($"Order {OrderID} has been cancelled. Press any key to return to main menu.");
             Console.ReadKey();
         }
-        public void PrintReceipt(List<OrderLine> OrderList, double payment)
+
+        public void PrintReceipt()//List<OrderLine> OrderList, double payment)
         {
             StringBuilder receipt = new StringBuilder("");
             Console.WriteLine("--- Receipt ---");
             foreach (var itemLine in OrderList)
             {
                 Console.WriteLine
-                (
-                    "{0} {1} ${2} ea. ${3}",
-                    itemLine.Item.Name,
-                    itemLine.Qty,
-                    itemLine.Item.Price,
-                    itemLine.Item.Price * itemLine.Qty
-                );
+               (
+                   "{0} {1} ${2} ea. ${3}",
+                   itemLine.Item.Name,
+                   itemLine.Qty,
+                   itemLine.Item.Price,
+                   itemLine.Item.Price * itemLine.Qty
+               );
+                switch (PaymentType) //make sure switch statement is displayed properly
+                {
+                    case 0:
+                        Console.WriteLine("Cash Payment");
+                        break;
+                    case 1:
+                        var lastFourDigits = Console.Read();
+                        Console.WriteLine("Credit/Debit Payment");
+                        Console.WriteLine("XXXXX{0}", lastFourDigits); //make this better
+                        break;
+                    case 2:
+                        Console.WriteLine("Check Payment");
+                        break;
+                    default:
+                        break;
+                }
             }
-            //var subTotal = CalculateSubTotal(OrderList);
-            //var salesTax = CalculateTaxRate(OrderList);
-            //var total = CalculateTotal(OrderList);
-            //Console.WriteLine("Subtotal: ${0:0.00}", subTotal);
-            //Console.WriteLine("Tax: ${0:0.00}", salesTax);
-            //Console.WriteLine("Total: ${0:0.00}", total);
-            //Console.WriteLine("Payment: ${0:0.00}", payment);
-            //decimal change = processPayment(total, payment);
+            double change = CalculateChange(TotalOrder, PaymentGeneric);
+            Console.WriteLine("Subtotal: ${0:0.00}", SubTotal);
+            Console.WriteLine("Tax: ${0:0.00}", CalculateTaxRate());
+            Console.WriteLine("Total: ${0:0.00}", TotalOrder);
+            //Console.WriteLine("Payment: ${0:0.00}", PaymentGeneric);//should show payment received
+            //Console.WriteLine("Your change is ${0: 0.00}", change);//should show exact change
+            //make sure this runs properly
         }
     }
 }
